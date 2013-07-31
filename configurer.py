@@ -113,7 +113,7 @@ class configurer:
 					self.Use(tenant,tenant,{'_id':'_'.join([subject_name,action_name,v,context]),'attr':{'subject':subject_name,'action':action_name,'object':v,'context':context}},'concrete_rules')
 
 					#if the "view" is administrative view, then we do not need to generate concrete rules that allow a subject to manage an object in the administrative view, we only need to specify that the subject can either "insert" or "delete" in this view, we thus skip the next loop that generate concrete rules for each object in the view
-					if v=='subject' or v=='action' or v=='object' or v=='role' or v=='activity' or v=='view' or v=='role_assignment' or v=='activity_assignment' or v=='licence' or v=='context':
+					if action_name=='insert' or action_name=='delete':
 						pass
 					else:
 						for va in itp.readObject(tenant,v,{}):

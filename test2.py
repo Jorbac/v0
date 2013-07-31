@@ -21,14 +21,14 @@ admin=admin(eva,config)
 
 t1=time()
 
-eva.concrete_evaluate('tenant','John','create','vm1')
+#print eva.concrete_evaluate('orange','Lily','use','vm1')
 
 t2=time()
 
 print t2-t1
 
-for i in range(0,999):
-	eva.concrete_evaluate('tenant','John','create','vm1')
+for i in range(0,1000):
+	eva.concrete_evaluate('orange','Lucy','use','vm5')
 t3=time()
 
 print t3-t2
