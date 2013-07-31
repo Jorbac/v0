@@ -13,11 +13,11 @@ class configurer:
 		self.itp.deleteObject(tenant,view,identifier)
 
 	def CreateTenant(self,issuer,tenantName):
-		self.Use(issuer,'TenantDB',{'_id':tenantName,'attr':{}},'tenant')
+		self.Use(self,issuer,'TenantDB',{'_id':tenantName,'attr':{}},'tenant')
 	def TenantHierarchy(self,issuer,tenantA,tenantB):
 		flag=self.itp.hasObject('TenantDB','tenant',{'_id':tenantA}) and self.itp.hasObject('TenantDB','tenant',{'_id':tenantB})
 		if flag==True:
-			self.Use(issuer,'TenantDB',{'_id':'_'.join([tenantA,tenantB]),'attr':{'parent':tenantA,'child':tenantB}},'tenant_hierarchy')
+			self.Use(self,issuer,'TenantDB',{'_id':'_'.join([tenantA,tenantB]),'attr':{'parent':tenantA,'child':tenantB}},'tenant_hierarchy')
 		else:
 			print "Tenant A or Tenant B does not exist"
 

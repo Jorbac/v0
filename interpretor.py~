@@ -18,9 +18,6 @@ class interpretor:
 	def readObject(self,tenant,view,expression):
 		return self.client[tenant][view].find(expression)
 
-	def readOneObject(self,tenant,view,expression):
-		return self.client[tenant][view].find_one(expression)
-
 	#check if such object exists
 	def hasObject(self,tenant,view,expression):
 		return not(self.client[tenant][view].find(expression).limit(1).count()==0)
