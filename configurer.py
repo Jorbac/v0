@@ -4,16 +4,21 @@ class configurer:
 		self.itp=itp
 
 	#Action to use an object in a view
-	#attention, a constraint on view is not added yet, this constraint should check if a view exists in the view collection before adding anything into this view
-
 	def Use(self,issuer,tenant,obj,view):
 		self.itp.insertObject(tenant,view,obj['_id'],obj['attr'],issuer)
+
 	#Action to unuse an object in a view
 	def Unuse(self,issuer,tenant,identifier,view):
-	#need to check if issuer is superior than usedBy in object, not implemented yet
-       		""" cross-tenant administration not implemented yet"""
 
 		self.itp.deleteObject(tenant,view,identifier)
+	
+
+		
+
+	#evaluate if a tenant is superior than another tenant
+	def Dominance(self,tenantA,tenantB):
+		return tenantA==tenantB or self.itp.hasObject('TenantDB','tenant_hierarchy',{'attr.parent':tenantA,'attr.child':tenantB})
+
 
 
 	#create a tenant and assign it to a hierarchy
@@ -27,7 +32,11 @@ class configurer:
 			print "Tenant A or Tenant B does not exist"
 
 	#delete a tenant and remove it from an hierarchy
-
+	def DeleteTenant(self,issuer,tenantName):
+		self.UnUse(issuer,'TenantDB',tenantName,'tenant')
+		#remove from hierarchy not implemented yet
+	def UnTenantHierarchy(self,issuer,tenantA,tenantB):
+		self.UnUse(issuer,'TenantDB','_'.join([tenantA,tenantB]),'tenant_hierarchy')
 
 
 
@@ -96,7 +105,38 @@ class configurer:
 	def Unpermission(self,issuer,tenant,permission_name):
 		self.Unuse(issuer,tenant,permission_name,'licence')
 
-	#produce concrete rules
+
+	#cross tenant permission, have one additional attribute in the licence, the target_tenant
+	def Cross_Permission(self,issuer,permission_name,init_tenant,role,target_tenant,activity,target_view,context):
+		flag=self.itp.hasObject(init_tenant,'role',{'_id':role}) and self.itp.hasObject(target_tenant,'view',{'_id':target_view}) and self.itp.hasObject(init_tenant,'context',{'_id':context})
+		if flag==True:
+			self.Use(issuer,init_tenant,{'_id':permission_name,'attr':{'role':role,'target_tenant':target_tenant,'mgmt_activity':activity,'target_view':target_view,'context':context}},'cross_licence')	
+		else:
+			print "error: in cross_permission, no init role or target /activity/view or context"
+
+	#cross tenant unpermission
+	def Cross_Unpermission(self,issuer,tenant,permission_name):
+		self.Unuse(issuer,tenant,permission_name,'cross_licence')
+
+	#produce concrete rules for cross_permission, since the cross permission only performs administrative actions, thus no need to enter in target view to get object
+	def Cross_ProduceConcreteRule(self,tenant):
+		itp=self.itp
+		itp.cleanView(tenant,'cross_concrete_rules')
+		for licence in itp.readObject(tenant,'cross_licence',{}):
+			r=licence['attr']['role']
+			a=licence['attr']['mgmt_activity']
+			target=licence['attr']['target_tenant']
+			v=licence['attr']['target_view']
+			context=licence['attr']['context']
+			for ra in itp.readObject(tenant,'role_assignment',{'attr.role':r}):
+				for aa in itp.readObject(tenant,'activity_assignment',{'attr.activity':a}):
+					#insert a concrete permission to allow a subject to perform certain action on the "view" object
+					subject_name=ra['attr']['subject']
+					action_name=aa['attr']['action']
+					self.Use(tenant,tenant,{'_id':'_'.join([subject_name,action_name,target,v,context]),'attr':{'subject':subject_name,'action':action_name,'target':target,'object':v,'context':context}},'cross_concrete_rules')
+		return 
+
+	#produce concrete rules for permission
 	def ProduceConcreteRule(self,tenant):
 		itp=self.itp
 		itp.cleanView(tenant,'concrete_rules')

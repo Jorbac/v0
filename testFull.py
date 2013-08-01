@@ -36,6 +36,7 @@ config.AssignView('null','orange',{'_id':'view','attr':{}})
 config.AssignView('null','orange',{'_id':'role_assignment','attr':{}})
 config.AssignView('null','orange',{'_id':'activity_assignment','attr':{}})
 config.AssignView('null','orange',{'_id':'licence','attr':{}})
+config.AssignView('null','orange',{'_id':'cross_licence','attr':{}})
 
 """3. we initialize it with assigning "John" to subject, "admin" to role, insert delete to action, insertActivity, deleteActivity and manage to activity and the first licence " John is permitted to manage licence in orange, also "nominal" to context"""
 #two default actions: insert and delete, two default activities: insertActivity and deleteActivity, another default activity: manage*
@@ -71,7 +72,7 @@ config.ProduceConcreteRule('orange')
 """4. we then use John to create licences for himself for all administrative views, then use John to create different users,actions, resources and assign them to different abstract roles,activities,views"""
 
 #create users
-#first we test without the licence to access "subject", we will see that the demand will be rejected
+#first we test without the licence to create "subject", we will see that the demand will be rejected
 admin.AssignSubject('orange','orange','John',{'_id':'Lily','attr':{}})
 #we then use John to create a licence for itself to access view "subject", return "sucess"
 admin.Permission('orange','licence2','orange','John','admin','manage','subject','nominal')
@@ -82,12 +83,12 @@ admin.AssignSubject('orange','orange','John',{'_id':'Lily','attr':{}})
 admin.AssignSubject('orange','orange','John',{'_id':'Lucy','attr':{}})
 admin.AssignSubject('orange','orange','John',{'_id':'Kim','attr':{}})
 
-#we then create two roles dev, s_dev
+#give John the licence to manage role_assignment and role
 admin.Permission('orange','licence100','orange','John','admin','manage','role_assignment','nominal')
 admin.Permission('orange','licence101','orange','John','admin','manage','role','nominal')
 config.ProduceConcreteRule('orange')
 
-#create two roles
+#we then create two roles dev, s_dev,create two roles
 admin.AssignRole('orange','orange','John',{'_id':'dev','attr':{}})
 admin.AssignRole('orange','orange','John',{'_id':'s_dev','attr':{}})
 
