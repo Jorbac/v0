@@ -26,8 +26,10 @@ class interpretor:
 		return not(self.client[tenant][view].find(expression).limit(1).count()==0)
 	def cleanView(self,tenant,view):
 		return self.client[tenant][view].remove()
-	def cleanAllCollection(self,tenant,allView):
+	def cleanAllCollection(self,tenant):
+		allView=self.client[tenant].collection_names()
 		for v in allView:
-			self.client[tenant][v].remove() 		
+			if v!='system.indexes':
+				self.client[tenant][v].remove() 		
 
 
