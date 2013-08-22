@@ -43,7 +43,7 @@ class evaluator:
 		activity_list=self.itp.readObject(issuer,'activity_assignment',{'attr.action':a})
 		for r in role_list:
 			for a in activity_list:
-				if self.itp.hasObject(tenant,'cross_licence',{'attr.role':r['attr']['role'],'attr.activity':a['attr']['activity'],'attr.view':view}):
+				if self.itp.hasObject(issuer,'cross_licence',{'attr.target_tenant':tenant,'attr.role':r['attr']['role'],'attr.mgmt_activity':a['attr']['activity'],'attr.target_view':view}):
 					return True
 		return False	
 

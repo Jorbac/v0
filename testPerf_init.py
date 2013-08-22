@@ -11,15 +11,15 @@ eva=evaluator(itp)
 admin=admin(eva,config)
 
 
-n_role=4
-n_activity=4
-n_view=4
+n_role=10
+n_activity=10
+n_view=10
 
 n_role_subject=10
 n_activity_action=10
-n_view_object=100
+n_view_object=400
 
-n_abstract_rule=20
+n_abstract_rule=30
 
 n_concrete_rule=n_abstract_rule*n_role_subject*n_activity_action*n_view_object
 

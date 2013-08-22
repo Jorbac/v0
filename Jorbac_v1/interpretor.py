@@ -16,7 +16,11 @@ class interpretor:
 		self.client[tenant][view].remove({'_id':identifier})
 		
 	def readObject(self,tenant,view,expression):
-		return self.client[tenant][view].find(expression)
+		cursor=self.client[tenant][view].find(expression)
+		result=[]
+		for ob in cursor:
+			result.append(ob)
+		return result
 
 	def readOneObject(self,tenant,view,expression):
 		return self.client[tenant][view].find_one(expression)

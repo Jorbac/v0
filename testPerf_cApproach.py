@@ -13,9 +13,9 @@ config=configurer(itp)
 
 eva=evaluator(itp)
 
-s_n=random.randrange(0,40)
-a_n=random.randrange(0,40)
-o_n=random.randrange(0,400)
+s_n=random.randrange(0,100)
+a_n=random.randrange(0,100)
+o_n=random.randrange(0,4000)
 
 t1=time()
 
@@ -26,9 +26,9 @@ t2=time()
 print t2-t1
 
 for i in range(0,50):
-	s_n=random.randrange(0,40)
-	a_n=random.randrange(0,40)
-	o_n=random.randrange(0,400)
+	s_n=random.randrange(0,100)
+	a_n=random.randrange(0,100)
+	o_n=random.randrange(0,4000)
 	eva.concrete_evaluate('test','subject'+str(s_n),'action'+str(a_n),'object'+str(o_n))
 t3=time()
 

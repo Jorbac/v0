@@ -7,23 +7,23 @@ class configurer:
 
 
 	#assign role,activity,view to a tenant
-	def AssignRole(self,issuer,tenant,obj):
+	def AssignRole(self,issuer,obj,tenant):
 		self.Use(issuer,obj,tenant,'role')
-	def AssignActivity(self,issuer,tenant,obj):
+	def AssignActivity(self,issuer,obj,tenant):
 		self.Use(issuer,obj,tenant,'activity')
-	def AssignView(self,issuer,tenant,obj):
+	def AssignView(self,issuer,obj,tenant):
 		self.Use(issuer,obj,tenant,'view')
-	def AssignContext(self,issuer,tenant,obj):
+	def AssignContext(self,issuer,obj,tenant):
 		self.Use(issuer,obj,tenant,'context')
 
 	#corresponding unassign actions
-	def UnassignRole(self,issuer,tenant,identifier):
+	def UnassignRole(self,issuer,identifier,tenant):
 		self.Unuse(issuer,identifier,tenant,'role')
-	def UnassignActivity(self,issuer,tenant,identifier):
+	def UnassignActivity(self,issuer,identifier,tenant):
 		self.Unuse(issuer,identifier,tenant,'activity')
-	def UnassignView(self,issuer,tenant,identifier):
+	def UnassignView(self,issuer,identifier,tenant):
 		self.Unuse(issuer,identifier,tenant,'view')
-	def UnassignContext(self,issuer,tenant,identifier):
+	def UnassignContext(self,issuer,identifier,tenant):
 		self.Unuse(issuer,identifier,tenant,'context')
 
 
@@ -33,6 +33,7 @@ class configurer:
 	def Use(self,issuer,obj,tenant,view):
 		#insert an object in the collection "view" of a tenant database, used by issuer
 		self.itp.insertObject(tenant,view,obj['_id'],obj['attr'],issuer)
+		self.itp.insertObject(tenant,'view',view,'{}',issuer)
 	#Action to unuse an object in a (tenant,view)
 	def Unuse(self,issuer,identifier,tenant,view):
 		#delete the object with _id=identifier in the collection "view" of a tenant database
@@ -87,6 +88,7 @@ class configurer:
 			self.Use(issuer,{'_id':permission_name,'attr':{'role':role,'activity':activity,'view':view,'context':context}},tenant,'licence')	
 		else:
 			print "error: in permission, no role/activity/view or context"
+
 
 	#permission unassignment
 	def Unpermission(self,issuer,tenant,permission_name):

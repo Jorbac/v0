@@ -8,28 +8,13 @@ config=configurer(itp)
 eva=evaluator(itp)
 ad=admin(eva,config)
 
-ad.AllowAction('apple','John','insert','apple','role_assignment','John')
 
-
-"""This script performs a complete test of our Python+MongoDB OrBAC single Tenant implementation"""
-
-"""Test Scenario
-1. we start from zero having a tenant called "apple"
-2. we insert all administrative views including: subject,action,object,role,activity,view,role_assignment,activity_assignment,licence
-3. we initialize it with assigning "John" to subject, "admin" to role, insert delete to action, insertActivity, deleteActivity and manage to activity and the first licence " John is permitted to manage licence in apple, also "nominal" to context
-4. we then use John to create licences for himself for all administrative views, then use John to create different users,actions, resources and assign them to different abstract roles,activities,views
-5. use John to assign users privileges
-6. use John to assign admin privileges to someone
-"""
 """1. we start from zero having a tenant called apple"""
 #create tenant
 config.CreateTenant('null','apple')
 """2. we insert all administrative views including: subject,action,object,role,activity,view,role_assignment,activity_assignment,licence
 """
 #create administrative views
-config.AssignView('null','apple',{'_id':'subject','attr':{}})
-config.AssignView('null','apple',{'_id':'action','attr':{}})
-config.AssignView('null','apple',{'_id':'object','attr':{}})
 config.AssignView('null','apple',{'_id':'context','attr':{}})
 config.AssignView('null','apple',{'_id':'role','attr':{}})
 config.AssignView('null','apple',{'_id':'activity','attr':{}})
@@ -61,34 +46,47 @@ config.AssignContext('null','apple',{'_id':'nominal','attr':{}})
 #give role admin the first licence to allow it to manage licence
 config.Permission('null','licence1','apple','admin','manage','licence','nominal')
 
-"""we now assume the identity of John to perform administrative actions"""
+#John try create a permission for himself
+ad.Permission('apple','John','test111','apple','admin','manage','role_assignment','nominal')
+ad.Permission('apple','John','test113','apple','admin','manage','activity','nominal')
+ad.AssignActivity('apple','John',{'_id':'access','attr':{}},'apple')
+#consider "read" as "access"
+#create some users and resources
+config.Consider('apple','read','apple','access')
+config.AssignRole('apple',{'_id':'user','attr':{}},'apple')
+config.Empower('apple','Alice','apple','user')
+config.Use('apple',{'_id':'vm1','attr':{}},'apple','resource')
+config.Use('apple',{'_id':'vm2','attr':{}},'apple','resource')
+config.Empower('apple','Lily','apple','user')
+config.Use('apple',{'_id':'vm3','attr':{}},'apple','resource')
+config.Use('apple',{'_id':'vm4','attr':{}},'apple','resource')
 
-#produce concrete rules
-config.ProduceConcreteRule('apple')
+
+ad.Permission('apple','John','test112','apple','admin','manage','role','nominal')
+ad.AssignRole('apple','John',{'_id':'dev','attr':{}},'apple')
+ad.Empower('apple','John','Alice','apple','dev')
+
+ad.Permission('apple','John','test114','apple','dev','access','resource','nominal')
+
+
+
+#create a tenant dep1
+config.CreateTenant('apple','dep1')
+config.TenantHierarchy('apple','apple','dep1')
+
+
 
 
 """4. we then use John to create licences for himself for all administrative views, then use John to create different users,actions, resources and assign them to different abstract roles,activities,views"""
 
-#create users
-#first we test without the licence to create "subject", we will see that the demand will be rejected
-admin.AssignSubject('apple','apple','John',{'_id':'Lily','attr':{}})
-#we then use John to create a licence for itself to access view "subject", return "sucess"
-admin.Permission('apple','licence2','apple','John','admin','manage','subject','nominal')
-#produce concrete rules
-config.ProduceConcreteRule('apple')
-#we then again insert subject:success
-admin.AssignSubject('apple','apple','John',{'_id':'Lily','attr':{}})
-admin.AssignSubject('apple','apple','John',{'_id':'Lucy','attr':{}})
-admin.AssignSubject('apple','apple','John',{'_id':'Kim','attr':{}})
 
 #give John the licence to manage role_assignment and role
-admin.Permission('apple','licence100','apple','John','admin','manage','role_assignment','nominal')
-admin.Permission('apple','licence101','apple','John','admin','manage','role','nominal')
-config.ProduceConcreteRule('apple')
+config.Permission('apple','licence100','apple','admin','manage','role_assignment','nominal')
+config.Permission('apple','licence101','apple','admin','manage','role','nominal')
 
 #we then create two roles dev, s_dev,create two roles
-admin.AssignRole('apple','apple','John',{'_id':'dev','attr':{}})
-admin.AssignRole('apple','apple','John',{'_id':'s_dev','attr':{}})
+config.AssignRole('apple','apple',{'_id':'dev','attr':{}})
+config.AssignRole('apple','apple',{'_id':'s_dev','attr':{}})
 
 #role assignment
 admin.Empower('apple','apple','John','Lily','dev')
@@ -142,5 +140,8 @@ admin.Permission('apple','licence10','apple','John','dev','useActivity','normalV
 admin.Permission('apple','licence11','apple','John','s_dev','useActivity','criticalVM','nominal')
 config.ProduceConcreteRule('apple')
 
+
+
+ad.AllowAction('apple','John','insert','apple','role_assignment','John')
 
 

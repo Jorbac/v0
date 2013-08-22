@@ -13,7 +13,6 @@ class configurer:
 		self.itp.deleteObject(tenant,view,identifier)
 	
 
-		
 
 	#evaluate if a tenant is superior than another tenant
 	def Dominance(self,tenantA,tenantB):
@@ -40,13 +39,7 @@ class configurer:
 
 
 
-	#assign subject,action,object,role,activity,view to a tenant
-	def AssignSubject(self,issuer,tenant,obj):
-		self.Use(issuer,tenant,obj,'subject')
-	def AssignAction(self,issuer,tenant,obj):
-		self.Use(issuer,tenant,obj,'action')
-	def AssignObject(self,issuer,tenant,obj):
-		self.Use(issuer,tenant,obj,'object')
+	#assign role,activity,view to a tenant
 	def AssignRole(self,issuer,tenant,obj):
 		self.Use(issuer,tenant,obj,'role')
 	def AssignActivity(self,issuer,tenant,obj):
@@ -55,14 +48,8 @@ class configurer:
 		self.Use(issuer,tenant,obj,'view')
 	def AssignContext(self,issuer,tenant,obj):
 		self.Use(issuer,tenant,obj,'context')
-		#need to create a collection for it?
+
 	#corresponding unassign actions
-	def UnassignSubject(self,issuer,tenant,identifier):
-		self.Unuse(issuer,tenant,identifier,'subject')
-	def UnassignAction(self,issuer,tenant,identifier):
-		self.Unuse(issuer,tenant,identifier,'action')
-	def UnassignObject(self,issuer,tenant,identifier):
-		self.Unuse(issuer,tenant,identifier,'object')
 	def UnassignRole(self,issuer,tenant,identifier):
 		self.Unuse(issuer,tenant,identifier,'role')
 	def UnassignActivity(self,issuer,tenant,identifier):
@@ -74,14 +61,14 @@ class configurer:
 
 	#role,activity assignment
 	def Empower(self,issuer,tenant,subject,role):
-		flag=self.itp.hasObject(tenant,'subject',{'_id':subject}) and self.itp.hasObject(tenant,'role',{'_id':role})
+		flag=self.itp.hasObject(tenant,'role',{'_id':role})
 		if flag==True:
 			self.Use(issuer,tenant,{'_id':'_'.join([subject,role]),'attr':{'subject':subject,'role':role}},'role_assignment')
 		else:
 			print "error: no such subject or role in the tenant"
 
 	def Consider(self,issuer,tenant,action,activity):
-		flag=self.itp.hasObject(tenant,'action',{'_id':action}) and self.itp.hasObject(tenant,'activity',{'_id':activity})
+		flag=self.itp.hasObject(tenant,'activity',{'_id':activity})
 		if flag==True:
 			self.Use(issuer,tenant,{'_id':'_'.join([action,activity]),'attr':{'action':action,'activity':activity}},'activity_assignment')
 		else:

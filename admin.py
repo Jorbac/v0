@@ -11,7 +11,7 @@ class admin:
 	def Use(self,issuer,tenant,admin,obj,view):
 		
 		#need to check if issuer is superior than target tenant, if yes, then ableToUse is temporary true (need to also check parent tenant's policy 
-		ableToUse=self.AllowAction(issuer,tenant,admin,'insert',view)
+		ableToUse=self.AllowAction(issuer,tenant,admin,'insert',obj,view)
 		if ableToUse:
 			self.config.Use(issuer,tenant,obj,view)
 		else:
@@ -24,9 +24,9 @@ class admin:
 	#Admin Action to unuse an object in a view
 	def Unuse(self,issuer,tenant,admin,identifier,view):
 		#need to check if issuer is superior than target tenant, if yes, then ableToUse is temporary true (need to also check parent tenant's policy 
-		ableToUse=self.AllowAction(issuer,tenant,admin,'delete',view)
+		ableToUnUse=self.AllowAction(issuer,tenant,admin,'delete',None,view)
 	
-		if ableToUse:
+		if ableToUnUse:
 			self.config.Unuse(issuer,tenant,view,identifier)
 		else:
 			message="User "+ admin+ "is not able to perform action insert into view "+ view
@@ -36,7 +36,7 @@ class admin:
 		return "success"
 
 	#This function use evaluator to decide if certain action can be performed
-	def AllowAction(self,issuer,tenant,admin,action,view):
+	def AllowAction(self,issuer,tenant,admin,action,obj,view):
 		ableToUse=False
 		#need to check if issuer is superior than target tenant, if yes, then ableToUse is temporary true (need to also check parent tenant's policy )
 		if self.config.Dominance(issuer,tenant):
@@ -44,6 +44,8 @@ class admin:
 		else:
 			print issuer+" cannot dominant "+tenant+", operation failed"
 			return ableToUse
+		#then need to check if issuer has the subject/object/action or not
+
 
 		#if issuer dominate tenant, then the able to use is decided by the administrative policy of issuer
 		if ableToUse and issuer!=tenant:
@@ -55,13 +57,7 @@ class admin:
 
 
 
-	#Admin action to assign subject,action,object,role,activity,view to a tenant, will be checked by AdOrBAC
-	def AssignSubject(self,issuer,tenant,admin,obj):
-		self.Use(issuer,tenant,admin,obj,'subject')
-	def AssignAction(self,issuer,tenant,admin,obj):
-		self.Use(issuer,tenant,admin,obj,'action')
-	def AssignObject(self,issuer,tenant,admin,obj):
-		self.Use(issuer,tenant,admin,obj,'object')
+	#Admin action to assign role,activity,view to a tenant, will be checked by AdOrBAC
 	def AssignRole(self,issuer,tenant,admin,obj):
 		self.Use(issuer,tenant,admin,obj,'role')
 	def AssignActivity(self,issuer,tenant,admin,obj):
@@ -72,12 +68,7 @@ class admin:
 		self.Use(issuer,tenant,admin,obj,'context')
 		#need to create a collection for it?
 	#corresponding unassign actions
-	def UnassignSubject(self,issuer,tenant,admin,identifier):
-		self.Unuse(issuer,tenant,admin,identifier,'subject')
-	def UnassignAction(self,issuer,tenant,admin,identifier):
-		self.Unuse(issuer,tenant,admin,identifier,'action')
-	def UnassignObject(self,issuer,tenant,admin,identifier):
-		self.Unuse(issuer,tenant,admin,identifier,'object')
+
 	def UnassignRole(self,issuer,tenant,admin,identifier):
 		self.Unuse(issuer,tenant,admin,identifier,'role')
 	def UnassignActivity(self,issuer,tenant,admin,identifier):
@@ -90,7 +81,7 @@ class admin:
 	#role,activity assignment
 	def Empower(self,issuer,tenant,admin,subject,role):
 		#need to check if the admin of issuer can perform such action
-		ableToUse=self.AllowAction(issuer,tenant,admin,'insert','role_assignment')
+		ableToUse=self.AllowAction(issuer,tenant,admin,'insert',subject,'role_assignment')
 		if ableToUse:
 			self.config.Empower(issuer,tenant,subject,role)
 		else:
@@ -104,7 +95,7 @@ class admin:
 
 	def Consider(self,issuer,tenant,admin,action,activity):
 		#need to check if the admin of issuer can perform such action
-		ableToUse=self.AllowAction(issuer,tenant,admin,'insert','activity_assignment')
+		ableToUse=self.AllowAction(issuer,tenant,admin,'insert',action,'activity_assignment')
 		if ableToUse:
 			self.config.Consider(issuer,tenant,action,activity)
 		else:
@@ -117,7 +108,7 @@ class admin:
 	#corresponding admin role,activity unassignment
 	def Unempower(self,issuer,tenant,admin,subject,role):
 		#need to check if the admin of issuer can perform such action
-		ableToUnUse=self.AllowAction(issuer,tenant,admin,'delete','role_assignment')
+		ableToUnUse=self.AllowAction(issuer,tenant,admin,'delete',None,'role_assignment')
 		if ableToUnUse:
 			self.config.Unempower(issuer,tenant,subject,role)
 		else:
@@ -129,7 +120,7 @@ class admin:
 
 	def Unconsider(self,issuer,tenant,admin,action,activity):
 		#need to check if the admin of issuer can perform such action
-		ableToUnUse=self.AllowAction(issuer,tenant,admin,'delete','activity_assignment')
+		ableToUnUse=self.AllowAction(issuer,tenant,admin,'delete',None,'activity_assignment')
 		if ableToUnUse:
 			self.config.Unconsider(issuer,tenant,action,activity)
 		else:
@@ -144,7 +135,7 @@ class admin:
 	#admin permission assignment, for now we do not use multi-grainularity licence
 	def Permission(self,issuer,permission_name,tenant,admin,role,activity,view,context):
 		#need to check if the admin of issuer can perform such action
-		ableToUse=self.AllowAction(issuer,tenant,admin,'insert','licence')
+		ableToUse=self.AllowAction(issuer,tenant,admin,'insert',None,'licence')
 		if ableToUse:
 			self.config.Permission(issuer,permission_name,tenant,role,activity,view,context)
 		else:
@@ -157,7 +148,7 @@ class admin:
 	#permission unassignment
 	def Unpermission(self,issuer,tenant,admin,permission_name):
 		#need to check if the admin of issuer can perform such action
-		ableToUnUse=self.AllowAction(issuer,tenant,admin,'delete','licence')
+		ableToUnUse=self.AllowAction(issuer,tenant,admin,'delete',None,'licence')
 		if ableToUnUse:
 			self.config.Unpermission(issuer,tenant,permission_name)
 		else:
@@ -170,7 +161,7 @@ class admin:
 	#admin cross permission assignment, for now we do not use multi-grainularity licence
 	def Cross_Permission(self,issuer,issuer_admin,permission_name,init_tenant,role,target_tenant,activity,target_view,context):
 		#need to check if the admin of issuer can perform such action
-		ableToUse=self.AllowAction(issuer,init_tenant,issuer_admin,'insert','cross_licence')
+		ableToUse=self.AllowAction(issuer,init_tenant,issuer_admin,'insert',None,'cross_licence')
 		if ableToUse:
 			self.config.Cross_Permission(issuer,permission_name,init_tenant,role,target_tenant,activity,target_view,context)
 		else:
@@ -183,7 +174,7 @@ class admin:
 	#cross permission unassignment
 	def Cross_Unpermission(self,issuer,issuer_admin,tenant,permission_name):
 		#need to check if the admin of issuer can perform such action
-		ableToUnUse=self.AllowAction(issuer,tenant,issuer_admin,'delete','cross_licence')
+		ableToUnUse=self.AllowAction(issuer,tenant,issuer_admin,'delete',None,'cross_licence')
 		if ableToUnUse:
 			self.config.Cross_Unpermission(issuer,tenant,permission_name)
 		else:
