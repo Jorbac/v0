@@ -113,7 +113,6 @@ class configurer:
 	def Dominance(self,tenantA,tenantB):
 		#Attention: same tenant relationship is not dominance
 		return self.itp.hasObject('TenantDB','tenant_hierarchy',{'attr.parent':tenantA,'attr.child':tenantB})
-
 	#*******************************************Produce Concrete Rules for normal permission in licence view**********************
 	def ProduceConcreteRule(self,tenant):
 		itp=self.itp
@@ -122,7 +121,6 @@ class configurer:
 			r=licence['attr']['role']
 			a=licence['attr']['activity']
 			v=licence['attr']['view']
-			context=licence['attr']['context']
 			for ra in itp.readObject(tenant,'role_assignment',{'attr.role':r}):
 				for aa in itp.readObject(tenant,'activity_assignment',{'attr.activity':a}):
 					#insert a concrete permission to allow a subject to perform certain action on the "view" object
@@ -140,6 +138,7 @@ class configurer:
 							self.Use(tenant,{'_id':'_'.join([subject_name,action_name,object_name,context]),'attr':{'subject':subject_name,'action':action_name,'object':object_name,'context':context}},tenant,'concrete_rules')
 
 		return 
+
 
 	#************************************************Check Authority Scope**************************************
 	#an object is in the authority scope of a tenant if this object plays some views in the tenant or in its child tenants
